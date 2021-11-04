@@ -1,63 +1,58 @@
 require('dotenv').config();
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
+const redis = require('redis');
+const redisClient = redis.createClient();
+const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
+const passport = require('passport');
+require('./passportSetup');
 
+// session
+const PORT = 3001;
 const app = express();
 
-const PORT = 3001;
-
-app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({ credentials: true, origin: process.env.ORIGIN }));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/api/all", (req, res) => {
-  res.json(list);
+const checkUser = require('./middleware/checkUser');
+const userRouter = require('./routes/userRouter');
+const noteRouter = require('./routes/noteRouter')
+const googleRouter = require('./routes/googleRouter');
+
+const sessionParser = session({
+  name: 'sesid',
+  store: new RedisStore({ client: redisClient }),
+  saveUninitialized: false,
+  secret: process.env.SECRET,
+  resave: false,
+  cookie: {
+    expries: 24 * 60 * 60e3,
+    httpOnly: true,
+  },
 });
+app.use(sessionParser);
 
-app.post("/api/new", (req, res) => {
-  const { title } = req.body;
+app.use(passport.initialize());
+app.use(passport.session());
 
-  if (title) {
-    const newPost = {
-      id: Date.now(),
-      title,
-      status: false,
-    };
+app.use(checkUser)
 
-    list.push(newPost);
+app.use('/user', userRouter);
+app.use('/note', noteRouter);
+app.use('/google', googleRouter);
 
-    return res.status(201).json(newPost);
-  }
-
-  return res.sendStatus(406);
+// Если HTTP-запрос дошёл до этой строчки, значит ни один из ранее встречаемых рутов не ответил на запрос. Это значит, что искомого раздела просто нет на сайте. Для таких ситуаций используется код ошибки 404. Создаём небольшое middleware, которое генерирует соответствующую ошибку.
+app.use((req, res, next) => {
+  const error = createError(404, 'Запрашиваемой страницы не существует на сервере.');
+  next(error);
 });
-
-app.delete('/api/:id', (req, res) => {
-  const id = req.params.id;
-
-  list.map((item, index) => { list[index].id === +id ? list.splice(index, 1) : false })
-  return res.sendStatus(200)
-});
-
-app.patch('/api/:id', (req, res) => {
-  const id = req.params.id;
-
-  const selectedTodo = list.find(el => String(el.id) === id)
-  selectedTodo.status = !selectedTodo.status
-  return res.json(selectedTodo)
-})
-
-app.patch('/api/edit/:id', (req, res) => {
-  const id = req.params.id;
-  const { title } = req.body
-  const selectedTodo = list.find(el => String(el.id) === id)
-  selectedTodo.title = title
-  res.json(title)
-})
 
 
 app.listen(PORT, () => {
-  console.log(`Server start on port`, PORT);
+  console.log(`server started PORT: ${PORT}`);
 });
