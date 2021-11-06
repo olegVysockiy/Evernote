@@ -1,6 +1,6 @@
 const initState = {
   user: null,
-  notes: [],
+  note: [],
 }
 
 export default initState

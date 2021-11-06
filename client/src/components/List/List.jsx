@@ -1,22 +1,19 @@
 import React, { useEffect } from 'react'
 import Card from '../Card/Card'
-import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { getAllTodoAction } from '../../redux/actions/todoAction'
+import { allNoteAction } from '../../redux/actions/noteAction'
 
 function List() {
-
   const dispatch = useDispatch()
-  const listOfTodo = (useSelector(state => state.todo))
+  const listOfNote = useSelector(state => state.note)
 
   useEffect(() => {
-    axios.get('http://localhost:3001/note/all')
-      .then(response => dispatch(getAllTodoAction(response.data)))
+   dispatch(allNoteAction())
   }, [])
 
   return (
     <div>
-      {listOfTodo.map(el => <Card title={el.title} key={el.id} id={el.id} status={el.status} />)}
+      {listOfNote.map(el => <Card title={el.title} key={el.id} id={el.id} status={el.status} />)}
     </div>
   )
 }

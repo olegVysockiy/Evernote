@@ -1,22 +1,21 @@
 import React from 'react'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { changeStatus, deleteTodoAction, editTodo } from '../../redux/actions/todoAction'
+import { changeStatus, deleteNoteAction, editNote } from '../../redux/actions/noteAction'
 
 function Card({ title, id, status }) {
 
   const [editButton, setEditButton] = useState(true)
   const [submitButton, setSubmitButton] = useState(false)
+  const dispatch = useDispatch()
 
   const switchHandler = () => {
     setEditButton(!editButton)
     setSubmitButton(!submitButton)
   }
 
-  const dispatch = useDispatch()
-
   const deleteHandler = (id) => {
-    dispatch(deleteTodoAction(id))
+    dispatch(deleteNoteAction(id))
   }
 
   const changeStatusHandler = (id) => {
@@ -25,9 +24,8 @@ function Card({ title, id, status }) {
 
   const editEventHandler = async (e) => {
     e.preventDefault()
-    console.log(id);
     const newFormData = Object.fromEntries(new FormData(e.target))
-    dispatch(editTodo(id, newFormData))
+    dispatch(editNote(id, newFormData))
   }
   return (
     <div className="container my-5">
@@ -45,7 +43,7 @@ function Card({ title, id, status }) {
         <>
           <form onSubmit={(e) => { editEventHandler(e); switchHandler() }}>
             <input type="text" name="title" />
-            <button type="submit">Submit</button>
+            <button type="submit">Change note</button>
           </form>
         </>}
 

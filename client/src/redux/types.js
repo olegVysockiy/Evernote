@@ -1,8 +1,8 @@
-export const GET_ALL_TODO = 'GET_ALL_TODO'
-export const ADD_NEW_TODO = 'ADD_NEW_TODO'
-export const DELETE_TODO = 'DELETE_TODO'
+export const GET_ALL_NOTE = 'GET_ALL_NOTE'
+export const ADD_NEW_NOTE = 'ADD_NEW_NOTE'
+export const DELETE_NOTE = 'DELETE_NOTE'
 export const CHANGE_STATUS = 'CHANGE_STATUS'
-export const EDIT_POST = 'EDIT_POST'
+export const EDIT_NOTE = 'EDIT_NOTE'
 
 export const ADD_USER = 'ADD_USER';
 export const GET_ADD_USER = 'GET_ADD_USER';

@@ -1,20 +1,20 @@
-import { ADD_NEW_TODO, CHANGE_STATUS, DELETE_TODO, EDIT_POST, GET_ALL_TODO } from "../types";
+import { ADD_NEW_NOTE, CHANGE_STATUS, DELETE_NOTE, EDIT_NOTE, GET_ALL_NOTE } from "../types";
 
-export default function todoReducer(todo = [], action) {
+export default function noteReducer(note = [], action) {
   const { type, payload } = action
   switch (type) {
-    case GET_ALL_TODO: {
+    case GET_ALL_NOTE: {
       return payload
     }
-    case ADD_NEW_TODO: {
-      return [...todo, payload]
+    case ADD_NEW_NOTE: {
+      return [...note, payload]
     }
-    case DELETE_TODO: {
+    case DELETE_NOTE: {
       const { id } = payload
-      return todo.filter(el => el.id !== id)
+      return note.filter(el => el.id !== id)
     }
     case CHANGE_STATUS: {
-      return todo.map(el => {
+      return note.map(el => {
         if (el.id === action.payload) {
           return {
             ...el,
@@ -24,9 +24,9 @@ export default function todoReducer(todo = [], action) {
         return el
       })
     }
-    case EDIT_POST: {
+    case EDIT_NOTE: {
       const { id, newFormData } = payload
-      return todo.map(el => {
+      return note.map(el => {
         if(el.id === id) {
           return { ...el, title: newFormData.title }
         }
@@ -34,6 +34,6 @@ export default function todoReducer(todo = [], action) {
       })
     }
     default:
-      return todo
+      return note
   }
 }

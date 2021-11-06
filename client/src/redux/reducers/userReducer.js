@@ -2,7 +2,6 @@ import { ADD_USER, DEL_USER, CHECK_USER, LOGIN_USER } from '../types'
 
 export default function userReducer(user = null, action) {
   const { type, payload } = action
-  // console.log('====>>>>>payload', payload)
   switch (type) {
     case ADD_USER: {
       return payload
