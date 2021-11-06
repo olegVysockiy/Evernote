@@ -9,22 +9,20 @@ function validateEmail(email) {
 }
 
 router.route('/reg').post(async (req, res) => {
-  const { name, email, password } = req.body.user;
+  const { email, password } = req.body.formData;
 
-  if (name && validateEmail(email) && password) {
+  if (validateEmail(email) && password) {
     const hashPass = await bcrypt.hash(password, +process.env.SALT);
     try {
       const newUser = await User.create({
-        name,
         email,
         password: hashPass,
       });
-
       req.session.user = {
         id: newUser.id,
-        name: newUser.name,
+        name: newUser.email,
       };
-      return res.json({ id: newUser.id, name: newUser.name });
+      return res.json({ id: newUser.id, email: newUser.email });
     } catch (error) {
       return res.sendStatus(405);
     }
@@ -43,10 +41,9 @@ router.route('/login').post(async (req, res) => {
       ) {
         req.session.user = {
           id: currentUser.id,
-          name: currentUser.name,
-          telegram: currentUser.telegram,
+          name: currentUser.email,
         };
-        return res.json({ user: req.session.user });
+        return res.json({ id: currentUser.id, email: currentUser.email });
       }
       return res.sendStatus(401);
     } catch (err) {

@@ -10,7 +10,7 @@ function List() {
   const listOfTodo = (useSelector(state => state.todo))
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/all')
+    axios.get('http://localhost:3001/note/all')
       .then(response => dispatch(getAllTodoAction(response.data)))
   }, [])
 

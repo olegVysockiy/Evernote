@@ -2,27 +2,29 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+
 const redis = require('redis');
-const redisClient = redis.createClient();
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
+const redisClient = redis.createClient();
+
 const passport = require('passport');
 require('./passportSetup');
 
-// session
-const PORT = 3001;
-const app = express();
-
-app.use(express.urlencoded({ extended: true }));
-app.use(cors({ credentials: true, origin: process.env.ORIGIN }));
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 const checkUser = require('./middleware/checkUser');
 const userRouter = require('./routes/userRouter');
 const noteRouter = require('./routes/noteRouter')
 const googleRouter = require('./routes/googleRouter');
+
+// session
+const PORT = 3001;
+const app = express();
+
+app.use(cors({ credentials: true, origin: process.env.ORIGIN }));
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const sessionParser = session({
   name: 'sesid',
@@ -31,16 +33,25 @@ const sessionParser = session({
   secret: process.env.SECRET,
   resave: false,
   cookie: {
+    path: '/',
     expries: 24 * 60 * 60e3,
     httpOnly: true,
   },
 });
 app.use(sessionParser);
 
+app.use(checkUser)
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(checkUser)
+app.use((req, res, next) => {
+  res.locals.token = process.env.API;
+  if (req.session.user) {
+    res.locals.user = req.session.user;
+  }
+  next();
+});
 
 app.use('/user', userRouter);
 app.use('/note', noteRouter);
