@@ -3,4 +3,4 @@
 ### Возможна регистрация через Google аккаунт.
 ### Заметки можно редактировать, удалять или изменять статус выполнение. 
 ### Пользователь видит и взимодействует только со своими заметками.
-![Alt text](/home/oleg/Evernote/client/public/evernoteSkrin.png?raw=true "Optional Title")
+![Alt text](/client/public/evernoteSkrin.png?raw=true "Optional Title")
