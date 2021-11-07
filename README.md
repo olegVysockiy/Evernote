@@ -5,5 +5,5 @@
 ### Пользователь видит и взимодействует только со своими заметками.
 ![Alt text](/client/public/evernoteSkrin.png?raw=true "Optional Title")
 #### Для работы необходимо создать файлы ".env" в папках "client" и "server" и заполнить их исходя из файлов "ENV.txt" 
-#### "npm i" в папках "client" и "server". Для запуска сервера в папке "server" команда "npm start" или "npm run dev". Для запуска клиента "client" в папке команда "npm start"
+#### "npm i" в папках "client" и "server". Для запуска сервера в папке "server" команда "npm start" или "npm run dev". Для запуска клиента в папке "client" команда "npm start".
 
