@@ -10,7 +10,7 @@ function validateEmail(email) {
 
 router.route('/reg').post(async (req, res) => {
   const { email, password } = req.body.formData;
-
+  req.session.user = {}
   if (validateEmail(email) && password) {
     const hashPass = await bcrypt.hash(password, +process.env.SALT);
     try {
@@ -54,16 +54,16 @@ router.route('/login').post(async (req, res) => {
   }
 });
 
-router.get('/check', (req, res) => {
+router.route('/check').get((req, res) => {
   if (req.session?.user) {
-    return res.json({ id: req.session.user.id, name: req.session.user.name });
+    return res.json({ id: req.session.user.id, email: req.session.user.name });
   }
   res.sendStatus(401);
 });
 
-router.get('/logout', (req, res) => {
+router.route('/logout').get((req, res) => {
   req.session.destroy();
-  res.clearCookie('sesid').redirect('/');
+  res.clearCookie('sId');
 });
 
 module.exports = router;

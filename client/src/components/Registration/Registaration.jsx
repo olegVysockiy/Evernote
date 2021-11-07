@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addUser } from '../../redux/actions/userAction';
+import { addUser, googleUser } from '../../redux/actions/userAction';
 
 export default function Registration() {
   const [formInput, setForm] = useState({});
@@ -21,6 +21,7 @@ export default function Registration() {
     dispatch(addUser(formInput))
     navigate('/')
   }
+  
   return (
     <>
       <form onSubmit={(e) => regHandler(e)}>

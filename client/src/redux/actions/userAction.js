@@ -20,6 +20,8 @@ export const delUserAction = () => ({
 })
 
 export const delUser = () => (dispatch) => {
+  console.log('===>>>>delAct')
+  axios.get('http://localhost:3001/user/logout')
   dispatch(delUserAction())
 }
 
@@ -33,3 +35,20 @@ export const loginUser = (loginForm) => async (dispatch) => {
   const responce = userFromBack.data
   dispatch(loginUserAction(responce))
 }
+
+export const checkUserAction = (responce) => ({
+  type: ADD_USER,
+  payload: responce,
+})
+
+export const checkUser = () => async (dispatch) => {
+  const userFromBack = await axios('http://localhost:3001/user/check')
+  const responce = userFromBack.data
+  dispatch(checkUserAction(responce))
+}
+
+export const googleUser = (responce) => ({
+  type: ADD_USER,
+  payload: responce,
+})
+

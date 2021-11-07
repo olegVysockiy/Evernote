@@ -11,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   Note.init({
     title: DataTypes.STRING,
-    status: DataTypes.BOOLEAN
+    status: DataTypes.BOOLEAN,
+    userId: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Note',

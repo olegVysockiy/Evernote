@@ -22,6 +22,7 @@ export default function Login() {
     navigate('/')
   }
   return (
+    <>
     <form onSubmit={(e) => regHandler(e)}>
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">Email address</label>
@@ -33,8 +34,11 @@ export default function Login() {
         <input type="password" name='password' value={formInput.password} onChange={inputChange} class="form-control" id="exampleInputPassword1" />
       </div>
       <button type="submit" class="btn btn-primary">Login</button>
-      <div id="googleHelp" class="form-text">You can login with Google.</div>
-      <button type="submit" class="btn btn-success">Google</button>
     </form>
+    <form action='http://localhost:3001/google' method='get'>
+        <div id="googleHelp" class="form-text">You can login with Google.</div>
+        <button type="submit" class="btn btn-success">Google</button>
+      </form>
+    </>
   )
 }

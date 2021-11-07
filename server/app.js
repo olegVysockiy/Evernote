@@ -8,18 +8,22 @@ const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const redisClient = redis.createClient();
 
+const http = require('http');
+const WebSocket = require('ws');
 const passport = require('passport');
-require('./passportSetup');
+require('./passportSetup');;
 
+const registerWsEmitter = require('./src/ws/wsEmitter');
 
 const checkUser = require('./middleware/checkUser');
+const indexRouter = require('./routes/indexRouter')
 const userRouter = require('./routes/userRouter');
 const noteRouter = require('./routes/noteRouter')
 const googleRouter = require('./routes/googleRouter');
 
-// session
-const PORT = 3001;
+const PORT = process.env.PORT;
 const app = express();
+const map = new Map();
 
 app.use(cors({ credentials: true, origin: process.env.ORIGIN }));
 app.use(morgan('dev'));
@@ -27,13 +31,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const sessionParser = session({
-  name: 'sesid',
+  name: 'sId',
   store: new RedisStore({ client: redisClient }),
   saveUninitialized: false,
   secret: process.env.SECRET,
   resave: false,
   cookie: {
-    path: '/',
     expries: 24 * 60 * 60e3,
     httpOnly: true,
   },
@@ -45,6 +48,7 @@ app.use(checkUser)
 app.use(passport.initialize());
 app.use(passport.session());
 
+
 app.use((req, res, next) => {
   res.locals.token = process.env.API;
   if (req.session.user) {
@@ -53,17 +57,49 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/user', userRouter);
-app.use('/note', noteRouter);
-app.use('/google', googleRouter);
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
-// Если HTTP-запрос дошёл до этой строчки, значит ни один из ранее встречаемых рутов не ответил на запрос. Это значит, что искомого раздела просто нет на сайте. Для таких ситуаций используется код ошибки 404. Создаём небольшое middleware, которое генерирует соответствующую ошибку.
-app.use((req, res, next) => {
-  const error = createError(404, 'Запрашиваемой страницы не существует на сервере.');
-  next(error);
+
+//1
+server.on('upgrade', function (request, socket, head) {
+  console.log('Parsing session from request...');
+  
+  sessionParser(request, {}, () => {
+    if (!request.session?.user?.id) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+    
+    console.log('Session is parsed!');
+    
+    wss.handleUpgrade(request, socket, head, function (ws) {
+      wss.emit('connection', ws, request);
+    });
+  });
 });
 
+registerWsEmitter(map);
 
-app.listen(PORT, () => {
-  console.log(`server started PORT: ${PORT}`);
+//2
+wss.on('connection', function (ws, request) {
+  const userId = request.session.user.id;
+  map.set(userId, ws);
+  
+  // registerWsMessages(map, ws);
+  // console.log(registerWsMessages(map, ws));
+  
+  ws.on('close', function () {
+    map.delete(userId);
+  });
+});
+
+// app.use('/', indexRouter)
+app.use('/google', googleRouter);
+app.use('/user', userRouter);
+app.use('/note', noteRouter);
+
+server.listen(PORT, (req, res) => {
+  console.log('Server start on port ', PORT);
 });
